@@ -10,7 +10,7 @@
 #define BYTES_IN_GIG		1073741824	// Should not be changed
 #define MAX_BYTES			MAX_STORAGE_GIG*BYTES_IN_GIG
 
-#define OS_NAME 		 	"myformat"	// 8 BYTES
+#define OS_NAME             "myformat"	// 8 BYTES
 #define BYTES_PER_SEC 		512			// 2 BYTES
 #define SECTORS_PER_CLUSTER 16			// 1 BYTE
 #define RESERVED_SECTORS 	2			// 2 BYTES
