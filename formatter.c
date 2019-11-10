@@ -7,13 +7,13 @@
 /* FAT32 Specification Link http://www.cs.fsu.edu/~cop4610t/assignments/project3/spec/fatspec.pdf */
 
 
-#define USB_PATH            "/dev/sdb"  // MAKE SURE THIS IS THE CORRECT PATH
+#define USB_PATH            "test_usb.bin"  // MAKE SURE THIS IS THE CORRECT PATH
 #define MAX_STORAGE_GIG	    4
 
 #define BYTES_IN_GIG        1073741824  // Should not be changed
-#define MAX_BYTES           MAX_STORAGE_GIG*BYTES_IN_GIG
+#define MAX_BYTES           (long long)MAX_STORAGE_GIG*BYTES_IN_GIG
 
-#define JMP_INSTRUCTION     0xeb0090    // MIGHT BE WRONG DUE TO ENDIANNESS
+#define JMP_INSTRUCTION     0x9000eb    // MIGHT BE WRONG DUE TO ENDIANNESS
 #define OS_NAME             "MYFORMAT"  // 8 BYTES
 #define BYTES_PER_SEC       512	        // 2 BYTES
 #define SECTORS_PER_CLUSTER 16          // 1 BYTE
@@ -39,16 +39,17 @@
 #define RESERVED            0           // 12 BYTES (must be 0)
 
 #define LOGIC_DRIVE_NUMBER  0x80        // 1 BYTE
-#define SIGNATURE           0x29        // 1 BYTE
+#define EXTENDED_SIGNATURE  0x29        // 1 BYTE
 #define SERIAL_NUMBEER      0x1010      // 4 BYTES
 #define VOLUME_LABEL        "USPSTICK   "// 11 BYTES
-#define SYSTEM_ID           "FAT32   "  // 8 BYTES
+#define FILE_SYS_TYPE       "FAT32   "  // 8 BYTES
 
+#define BOOT_SIG            0x55aa      // 2 BYTES
 
 
 void format_usb(){
-    FILE *usb = fopen(USB_PATH, 'r+');
-    fseek(usb, 0L, SEEK_START);
+    FILE *usb = fopen(USB_PATH, "w");
+    fseek(usb, 0L, SEEK_SET);
 
     int jmp_inst = JMP_INSTRUCTION;
     fwrite(&jmp_inst, 1, 3, usb);
@@ -106,6 +107,34 @@ void format_usb(){
     int fat_info_sec = LOGIC_INFO_SECTOR;
     fwrite(&fat_info_sec, 1, 2, usb);
 
+    int fat_backup_sec = LOGIC_BACKUP_SECTOR;
+    fwrite(&fat_backup_sec, 1, 2, usb);
+
+    long long reserved = RESERVED;
+    fwrite(&reserved, 1, 12, usb);
+
+    char drive_num = LOGIC_DRIVE_NUMBER;
+    fwrite(&drive_num, 1, 1, usb);
+
+    fwrite(&reserved, 1, 1, usb);
+
+    char ex_boot_sig = EXTENDED_SIGNATURE;
+    fwrite(&ex_boot_sig, 1, 1, usb);
+
+    int volume_id = SERIAL_NUMBEER;
+    fwrite(&volume_id, 1, 4, usb);
+
+    fwrite(VOLUME_LABEL, 1, 11, usb);
+
+    fwrite(FILE_SYS_TYPE, 1, 8, usb);
+
+    char trash[512];
+    memset(trash, '@', 512);
+    fwrite(trash, 1, 510 - ftell(usb), usb);
+
+    fseek(usb, 510L, SEEK_SET);
+    int boot_sig = BOOT_SIG;
+    fwrite(&boot_sig, 1, 2, usb);
 }
 
 

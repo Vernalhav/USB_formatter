@@ -1,10 +1,21 @@
 BIN = formatter
+EXTENSION = c
+
+CC = gcc
 
 all: $(BIN).o
-	g++ $(BIN).o -o $(BIN)
+	$(CC) $(BIN).o -o $(BIN)
 
-$(BIN).o: $(BIN).cpp
-	g++ -g $(BIN).cpp -c
+$(BIN).o: $(BIN).$(EXTENSION)
+	$(CC) -g $(BIN).$(EXTENSION) -c
+
+.PHONY: test, debug, clean
 
 test:
 	./$(BIN)
+
+debug:
+	gdb $(BIN)
+
+clean:
+	rm *.o $(BIN)
