@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define USB_PATH			"/dev/sdb"
+#define USB_PATH		"/dev/sdb"
 
 #define OS_NAME 		 "myformat"	// 8 BYTES
 #define BYTES_PER_SEC 		 512		// 2 BYTES
